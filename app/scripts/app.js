@@ -8,26 +8,31 @@
 		init: function() {
 			console.log("init");
 			this.clickHandler = this.putPointToScene.bind(this);
+			this.moveHandler = this.move.bind(this);
+
 			this.canvas.addEventListener('click', this.clickHandler);
 		},
 
 		move: function(e) {
-			console.log('move', e);
+			console.log('move', e, this);
+			this.render();
+			this.drawPoint(e.layerX, e.layerY);
 		},
 
 		up: function(e) {
 			console.log('up', e);
-			this.canvas.removeEventListener('mousemove', this.move);
+			this.canvas.removeEventListener('mousemove', this.moveHandler);
 		},
 
 		down: function(e) {
 			console.log('down', e);
-			this.canvas.addEventListener('mousemove', this.move);
+			this.canvas.addEventListener('mousemove', this.moveHandler);
 		},
 
 		putPointToScene: function(event) {
 			if( this.counter > 0) {
 				this.counter--;
+				this.points.push({ x: event.layerX, y: event.layerY });
 				this.drawPoint(event.layerX, event.layerY);
 			} else {
 					this.canvas.removeEventListener('click', this.clickHandler);
@@ -37,8 +42,14 @@
 			}
 		},
 
+		render: function() {
+			this.canvasContext.clearRect(0, 0, 500, 500);
+			this.points.forEach(function(item) {
+				this.drawPoint(item.x, item.y);
+			}.bind(this))
+		},
+
 		drawPoint: function(_x, _y) {
-			this.points.push({ x: _x, y: _y });
 			this.canvasContext.beginPath();
 			this.canvasContext.arc(_x, _y, 11, 0, 2*Math.PI);
 			this.canvasContext.stroke();
