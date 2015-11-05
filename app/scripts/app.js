@@ -17,6 +17,8 @@
 			console.log('move', e, this);
 			this.render();
 			this.drawPoint(e.layerX, e.layerY);
+
+			// update coords for current point in [POINTS]
 		},
 
 		up: function(e) {
@@ -27,6 +29,8 @@
 		down: function(e) {
 			console.log('down', e);
 			this.canvas.addEventListener('mousemove', this.moveHandler);
+
+			// find current coords in [POINTS]
 		},
 
 		putPointToScene: function(event) {
