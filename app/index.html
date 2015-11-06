@@ -24,18 +24,22 @@
     <!-- Add your site or application content here -->
 		<h3>CMIND-canvas</h3>
 		<div id="mainContainer">
-			<canvas id="mainScene" width="500" height="500"></canvas>	
+			<canvas id="mainScene" width="500" height="500"></canvas>
+			<svg id="mainCanvas" width="500" height="500"></svg>
 		</div>
 
 
     <!-- build:js(.) scripts/vendor.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js" type="text/javascript"></script>
     <!-- bower:js -->
 
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
-    <script src="scripts/app.js"></script>
+    <!--<script src="scripts/app.js"></script> -->
+    <script src="scripts/appd3.js"></script>
     <!-- endbuild -->
 </body>
 </html>
