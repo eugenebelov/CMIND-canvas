@@ -26,7 +26,15 @@
 				}
 				else {
 					this.canvas.on('click', null);
-					this.drawPoly();
+
+					var coords = this.points.slice(),
+							newpoint = this.calculateFourthPoint();
+					coords.push(newpoint);
+
+					// console.log('lolol', this.convertCoordsToPoly(coords), this.points);
+
+					this.drawPoint(newpoint.x, newpoint.y)
+					this.drawPoly(coords);
 				}
 			}
 		},
@@ -34,14 +42,14 @@
 		drawPoint: function(_x, _y) {
 			this.canvas
 					.append("circle")
+					.attr("fill", "blue")
 					.attr("cx", _x)
 					.attr("cy", _y)
 					.attr("r", 11);
 		},
 
 		drawPoly: function(points) {
-			var coords = this.convertCoordsToPoly(this.points);
-			console.log('lolol', coords);
+			var coords = this.convertCoordsToPoly(points);
 
 			this.canvas
 					.append("polygon")
@@ -59,6 +67,18 @@
 			});
 
 			return result;
+		},
+
+		calculateFourthPoint: function() {
+			var _x1 = (this.points[0].x + this.points[2].x) / 2,
+					_y1 = (this.points[0].y + this.points[2].y) / 2,
+					_x2 = _x1*2 - this.points[1].x,
+					_y2 = _y1*2 - this.points[1].y;
+
+			return {
+				x: _x2,
+				y: _y2
+			};
 		},
 
 		resetSvgCanvas: function() {
