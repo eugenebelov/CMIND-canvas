@@ -52,6 +52,8 @@
 					id.attr('cy', Math.floor(pt.y));
 
 				}.bind(this));
+
+				this.updateInfo(this.resizedCoords);
 			}
 		},
 
@@ -113,6 +115,8 @@
 							.drawPoly(coords)
 							.drawCircle(coords);
 
+					this.drawInfo();
+
 					console.log(this.points, this.counter);
 				}
 			} else {
@@ -135,6 +139,26 @@
 			return this;
 		},
 
+		drawInfo: function() {
+			var info = this.canvas.append('g').attr('id', 'info').attr('transform', 'translate(10, 20)');
+			info.append("text").attr('id', 'p1').attr('y', 10).text('Point 1: x' + this.points[0].x + " y" + this.points[0].y);
+			info.append("text").attr('id', 'p2').attr('y', 30).text('Point 2: x' + this.points[1].x + " y" + this.points[1].y);
+			info.append("text").attr('id', 'p3').attr('y', 50).text('Point 3: x' + this.points[2].x + " y" + this.points[2].y);
+			info.append("text").attr('id', 'p4').attr('y', 70).text('Point 4: x' + this.points[3].x + " y" + this.points[3].y);
+			info.append("text").attr('id', 'rect').attr('y', 90).text('Rect area:' + this.areaRect(this.points).area);
+			info.append("text").attr('id', 'circ').attr('y', 110).text('Circle radius:' + this.areaRect(this.points).r);
+		},
+
+		updateInfo: function(_verticles) {
+			var info = this.canvas.select('#info');
+			info.select('#p1').text('Point 1: x' + _verticles[0].x + " y" + _verticles[0].y);
+			info.select('#p2').text('Point 2: x' + _verticles[1].x + " y" + _verticles[1].y);
+			info.select('#p3').text('Point 3: x' + _verticles[2].x + " y" + _verticles[2].y);
+			info.select('#p4').text('Point 4: x' + _verticles[3].x + " y" + _verticles[3].y);
+			info.select('#rect').text('Rect area:' + this.areaRect(_verticles).area);
+			info.select('#circ').text('Circle radius:' + this.areaRect(_verticles).r);
+		},
+
 		drawPoint: function(_x, _y) {
 			this.canvas.selectAll('g')
 							.append("circle")
@@ -145,7 +169,7 @@
 								.attr('stroke-width', '1')
 								.attr("cx", _x)
 								.attr("cy", _y)
-								.attr("r", 11)
+								.attr("r", 5.5)
 								.call(this.drag);
 
 			return this;
@@ -210,6 +234,7 @@
 			var circleRadius = Math.floor( Math.sqrt( area / Math.PI ));
 
 			return {
+				area: area,
 				r: circleRadius,
 				center: {
 					x: cx,
