@@ -12,35 +12,63 @@
 
 		init: function() {
 			console.log("init");
+
 			this.setVerticleHandler = this.putPointToScene.bind(this);
 			this.setResetHandler = this.resetSvgCanvas.bind(this);
 
 			this.canvas.on('mousedown', this.setVerticleHandler);
 			this.resetButton.on('click', this.setResetHandler);
 
-			var that = this;
-			this.drag.on("dragstart", function() {
-										d3.event.sourceEvent.stopPropagation();
-										this.draggedObject = d3.selectAll(d3.event.sourceEvent.target)[0];
-										this.isDraggind = true;
-							    }.bind(this))
-						    .on("drag", function() {
-										var obj = d3.select(this.draggedObject);
-										obj.attr("cx", (d3.event.x))
-												.attr("cy", (d3.event.y));
+			this.canvas.append("g");
 
-										this.updateVerticle(d3.event.x, d3.event.y);
+			this.drag.on("dragstart", this.onDragVerticleStart.bind(this))
+						    .on("drag", this.onDragVerticle.bind(this))
+						    .on("dragend", this.onDragVerticleEnd.bind(this))
+		},
 
-										if(this.points.length > 3) this.updateRectangle(obj);
+		onDragVerticleStart: function() {
+			d3.event.sourceEvent.stopPropagation();
+			this.draggedObject = d3.selectAll(d3.event.sourceEvent.target)[0];
+			this.isDraggind = true;
+		},
 
-							    }.bind(this))
-						    .on("dragend", function(d) {
+		onDragVerticle: function() {
+			var obj = d3.select(this.draggedObject);
+			obj.attr("cx", (d3.event.x))
+					.attr("cy", (d3.event.y));
 
-									this.points = this.resizedCoords;
-									this.draggedObject = null;
-									this.isDraggind = false;
+			this.updateVerticle(d3.event.x, d3.event.y);
 
-							    }.bind(this))
+			if(this.points.length > 3) {
+				this.updateRectangle(obj);
+
+				this.resizedCoords.forEach(function(pt, index) {
+					var id = d3.select('#verticle' + index);
+
+					id.attr('cx', Math.floor(pt.x));
+					id.attr('cy', Math.floor(pt.y));
+
+				}.bind(this));
+			}
+		},
+
+		onDragVerticleEnd: function() {
+			if(this.resizedCoords.length > 0) {
+
+				this.resizedCoords.forEach(function(pt, index) {
+					var id = d3.select('#verticle' + index);
+
+					id.attr('id', 'verticle' + index)
+					id.attr('data', index)
+					id.attr('cx', Math.floor(pt.x));
+					id.attr('cy', Math.floor(pt.y));
+
+				}.bind(this));
+
+				this.points = this.resizedCoords;
+			}
+			this.draggedObject = null;
+			this.isDraggind = false;
 		},
 
 		updateRectangle: function(obj) {
@@ -52,16 +80,8 @@
 			arr[2] = ( (index + 1 > this.points.length - 1) ? this.points[0] : this.points[index + 1]);
 			arr[3] = this.calculateFourthPoint(arr);
 
-			arr.forEach(function(pt, index) {
-				var id = d3.select('#verticle' + index);
-
-				id.attr('cx', Math.floor(pt.x));
-				id.attr('cy', Math.floor(pt.y));
-
-			}.bind(this))
-
 			this.drawPoly(arr)
-					.drawCircle();
+					.drawCircle(arr);
 
 			this.resizedCoords = arr;
 
@@ -78,6 +98,9 @@
 					this.counter--;
 				}
 				else {
+
+					if(this.points.length >= 4) return;
+
 					var coords = this.points.slice(),
 							newpoint = this.calculateFourthPoint(this.points);
 
@@ -85,9 +108,9 @@
 					this.drawPoint(newpoint.x, newpoint.y)
 							.addVerticle(newpoint.x, newpoint.y)
 							.drawPoly(coords)
-							.drawCircle();
+							.drawCircle(coords);
 
-					console.log(this.points);
+					console.log(this.points, this.counter);
 				}
 			} else {
 
@@ -110,17 +133,17 @@
 		},
 
 		drawPoint: function(_x, _y) {
-			this.canvas
-					.append("circle")
-					.attr('id', 'verticle' + this.counter)
-					.attr('data', this.points.length)
-					.attr('fill', 'rgba(128, 0, 128, 0)')
-					.attr('stroke', 'blue')
-					.attr('stroke-width', '1')
-					.attr("cx", _x)
-					.attr("cy", _y)
-					.attr("r", 11)
-					.call(this.drag);
+			this.canvas.selectAll('g')
+							.append("circle")
+								.attr('id', 'verticle' + this.counter)
+								.attr('data', this.points.length)
+								.attr('fill', '#B30000')
+								.attr('stroke', '#B30000')
+								.attr('stroke-width', '1')
+								.attr("cx", _x)
+								.attr("cy", _y)
+								.attr("r", 11)
+								.call(this.drag);
 
 			return this;
 		},
@@ -131,28 +154,28 @@
 			d3.select('#paralelogram').remove();
 
 			this.canvas
-					.append("polygon")
+					.insert("polygon", 'g')
 					.attr('id', 'paralelogram')
-					.attr('fill', 'rgba(128, 0, 128, 0)')
-					.attr('stroke', 'blue')
+					.attr('fill', 'rgba(0, 0, 0, 0)')
+					.attr('stroke', '#0066FF')
 					.attr('stroke-width', '2')
 					.attr("points", coords);
 
 			return this;
 		},
 
-		drawCircle: function() {
-			var r = this.areaRect().r,
-					center = this.areaRect().center;
+		drawCircle: function(coords) {
+			var r = this.areaRect(coords).r,
+					center = this.areaRect(coords).center;
 
 			d3.select('#circleOutside').remove();
 
 			this.canvas
-					.append("circle")
+					.insert("circle", 'g')
 					.attr('id', 'circleOutside')
-					.attr('fill', 'rgba(128, 0, 128, 0)')
-					.attr('stroke', 'blue')
-					.attr('stroke-width', '1')
+					.attr('fill', 'rgba(0, 0, 0, 0)')
+					.attr('stroke', '#E6B800')
+					.attr('stroke-width', '2')
 					.attr("cx", center.x)
 					.attr("cy", center.y)
 					.attr("r", r);
@@ -160,18 +183,18 @@
 			return this;
 		},
 
-		areaRect: function() {
-			var a = Math.floor(Math.sqrt( Math.pow(this.points[1].x - this.points[0].x, 2) + Math.pow(this.points[1].y - this.points[0].y, 2) )),
-					b = Math.floor(Math.sqrt( Math.pow(this.points[2].x - this.points[1].x, 2) + Math.pow(this.points[2].y - this.points[1].y, 2) )),
-					c = Math.floor(Math.sqrt( Math.pow(this.points[2].x - this.points[0].x, 2) + Math.pow(this.points[2].y - this.points[0].y, 2) )),
+		areaRect: function(_points) {
+			var a = Math.floor(Math.sqrt( Math.pow(_points[1].x - _points[0].x, 2) + Math.pow(_points[1].y - _points[0].y, 2) )),
+					b = Math.floor(Math.sqrt( Math.pow(_points[2].x - _points[1].x, 2) + Math.pow(_points[2].y - _points[1].y, 2) )),
+					c = Math.floor(Math.sqrt( Math.pow(_points[2].x - _points[0].x, 2) + Math.pow(_points[2].y - _points[0].y, 2) )),
 					p = (a + b + c) /2,
 					area = Math.floor( Math.sqrt( p*(p - a)*(p - b)*(p - c))) *2;
 
 			var cx, cy;
-			var x1 = this.points[2].x,
-					x2 = this.points[0].x,
-					y1 = this.points[2].y,
-					y2 = this.points[0].y;
+			var x1 = _points[2].x,
+					x2 = _points[0].x,
+					y1 = _points[2].y,
+					y2 = _points[0].y;
 
 			if( x2 > x1) cx = x1 + (x2 - x1) /2
 			if( x2 < x1) cx = x2 + (x1 - x2) /2
@@ -220,7 +243,7 @@
 			console.log("reset");
 			this.counter = 3;
 			this.points = [];
-			this.canvas.on('click', this.setVerticleHandler);
+			this.canvas.on('mousedown', this.setVerticleHandler);
 			d3.selectAll('svg > *').remove();
 		}
 	};
