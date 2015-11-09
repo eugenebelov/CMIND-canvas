@@ -7,6 +7,14 @@ body {
 	padding: 0;
 }
 
+#mainContainer a {
+	color: #000;
+}
+
+#mainContainer a:hover {
+	text-decoration: none;
+}
+
 #mainContainer .menu li {
 	display: inline-block;
 }
