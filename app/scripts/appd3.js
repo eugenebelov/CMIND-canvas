@@ -2,6 +2,7 @@
 	var MainScene = {
 		canvas: d3.select('#mainCanvas'),
 		resetButton: d3.select('#resetButton'),
+		aboutButton: d3.select('#aboutButton'),
 		canvasNode: d3.select('#mainCanvas')[0][0],
 		drag: d3.behavior.drag(),
 		counter: 3,
@@ -15,9 +16,11 @@
 
 			this.setVerticleHandler = this.putPointToScene.bind(this);
 			this.setResetHandler = this.resetSvgCanvas.bind(this);
+			this.setAboutHandler = this.showAbout.bind(this);
 
 			this.canvas.on('mousedown', this.setVerticleHandler);
 			this.resetButton.on('click', this.setResetHandler);
+			this.aboutButton.on('click', this.setAboutHandler);
 
 			this.canvas.append("g");
 
@@ -239,12 +242,26 @@
 			};
 		},
 
+		showAbout: function() {
+			var about = d3.select('.about');
+			about.classed('in', !about.classed('in'));
+		},
+
 		resetSvgCanvas: function() {
 			console.log("reset");
 			this.counter = 3;
 			this.points = [];
+			this.resizedCoords = [];
+			this.draggedObject = null;
+
+			d3.selectAll('svg > *')
+					.transition()
+						.delay('400')
+						.style("opacity", "0")
+					.remove();
+
 			this.canvas.on('mousedown', this.setVerticleHandler);
-			d3.selectAll('svg > *').remove();
+			this.canvas.append("g");
 		}
 	};
 

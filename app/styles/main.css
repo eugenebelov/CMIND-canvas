@@ -1,7 +1,59 @@
-#mainContainer {
-	border: 1px solid #CCC;
+body {
+	font-family: "Helvetica"
+}
+
+#mainContainer .menu {
+	list-style-type: none;
+	padding: 0;
+}
+
+#mainContainer .menu li {
+	display: inline-block;
 }
 
 canvas, svg#mainCanvas {
 	border: 1px solid black;
+}
+
+circle {
+	cursor: pointer;
+}
+
+.nav-collapse {
+  clear: both;
+  display: block;
+  margin: 0px;
+}
+
+.collapse {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  -webkit-transition: height 0.35s ease;
+  -moz-transition: height 0.35s ease;
+  -o-transition: height 0.35s ease;
+  transition: height 0.35s ease;
+}
+
+.nav-collapse,
+.nav-collapse.collapse {
+  overflow: hidden;
+  height: 0;
+}
+
+.collapse.in {
+  height: 300px;
+}
+
+input[role="button"] {
+	font-size: 14px;
+	color: #FFF;
+	background-color: #337AB7;
+	border: 1px solid #337AB7;
+	border-radius: 4px;
+	display: inline-block;
+	padding: 6px 12px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	cursor: pointer;
 }
